@@ -1,4 +1,3 @@
-// file: app/widgets/custom_seek_bar.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
@@ -50,7 +49,7 @@ class CustomSeekBar extends StatelessWidget {
                             child: Container(
                               width: 8,
                               height: 8,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
                               ),

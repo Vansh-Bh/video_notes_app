@@ -1,4 +1,3 @@
-// file: app/widgets/video_grid.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/video_data.dart';
@@ -11,17 +10,20 @@ class VideoGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 16 / 9,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 16 / 9,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        itemCount: videos.length,
+        itemBuilder: (context, index) {
+          return VideoThumbnail(video: videos[index]);
+        },
       ),
-      itemCount: videos.length,
-      itemBuilder: (context, index) {
-        return VideoThumbnail(video: videos[index]);
-      },
     );
   }
 }
@@ -36,19 +38,43 @@ class VideoThumbnail extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.VIDEO_PLAYER, arguments: video),
       child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
             Expanded(
-              child: Image.network(video.thumbnailUrl, fit: BoxFit.cover),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.network(
+                  video.thumbnailUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(video.title, style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('Last watched: ${video.lastWatched.toString().split(' ')[0]}'),
-                  Text('Notes: ${video.noteCount}'),
+                  Text(
+                    video.title,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Last watched: ${video.lastWatched.toString().split(' ')[0]}',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Notes: ${video.noteCount}',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ],
               ),
             ),
@@ -58,6 +84,3 @@ class VideoThumbnail extends StatelessWidget {
     );
   }
 }
-
-
-

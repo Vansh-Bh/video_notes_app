@@ -1,10 +1,8 @@
-// file: app/modules/video_player/controllers/video_player_controller.dart
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_notes_app/api_service.dart';
 import 'package:video_notes_app/models/note.dart';
-import 'dart:io';
 
 import 'package:video_notes_app/models/video_data.dart';
 
@@ -91,7 +89,7 @@ class VideoPlayerController extends GetxController {
   void goToPreviousNote() {
     final currentPosition = player.state.position;
     final previousNote = notes.lastWhere(
-      (note) => note!.timestamp < currentPosition,
+      (note) => note.timestamp < currentPosition,
       orElse: () => notes.last,
     );
     player.seek(previousNote.timestamp);

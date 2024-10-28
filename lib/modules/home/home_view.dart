@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_notes_app/modules/home/home_controller.dart';
+import 'package:video_notes_app/theme_changer.dart';
 import '../../../widgets/video_grid.dart';
 
 class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
+    final themeService = Get.find<ThemeService>();
     return Scaffold(
       appBar: AppBar(
         title: Text('My Videos'),
@@ -14,6 +16,14 @@ class HomeView extends GetView<HomeController> {
             icon: Icon(Icons.add),
             onPressed: controller.addVideo,
           ),
+          Obx(() => IconButton(
+                icon: Icon(themeService.isDarkMode.value
+                    ? Icons.light_mode
+                    : Icons.dark_mode),
+                onPressed: () {
+                  themeService.switchTheme();
+                },
+              )),
         ],
       ),
       body: Obx(() {

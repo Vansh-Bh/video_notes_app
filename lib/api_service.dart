@@ -1,11 +1,10 @@
-// lib/services/api_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:video_notes_app/models/note.dart';
 import 'package:video_notes_app/models/video_data.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:3000/api'; // Use your actual IP if not using an emulator
+  static const String baseUrl = 'http://localhost:3000/api';
 
   static Future<List<VideoData>> fetchVideos() async {
     final response = await http.get(Uri.parse('$baseUrl/videos'));
