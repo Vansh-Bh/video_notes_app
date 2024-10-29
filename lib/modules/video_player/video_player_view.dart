@@ -50,6 +50,69 @@ class VideoPlayerView extends GetView<VideoPlayerController> {
                       ],
                     ),
                   ),
+                  ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          final Set<int> expandedNotes = {};
+
+                          return StatefulBuilder(
+                            builder: (context, setState) => ListView.builder(
+                              itemCount: controller.notes.length,
+                              itemBuilder: (context, index) {
+                                final note = controller.notes[index];
+                                final timestamp = note.timestamp;
+                                final formattedTime =
+                                    "${timestamp.inHours.toString().padLeft(2, '0')}:${(timestamp.inMinutes % 60).toString().padLeft(2, '0')}:${(timestamp.inSeconds % 60).toString().padLeft(2, '0')}";
+                                bool isExpanded = expandedNotes.contains(index);
+
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(note.title),
+                                      subtitle: Text(formattedTime),
+                                      trailing: IconButton(
+                                        icon: Icon(
+                                          isExpanded
+                                              ? Icons.expand_less
+                                              : Icons.expand_more,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (isExpanded) {
+                                              expandedNotes.remove(index);
+                                            } else {
+                                              expandedNotes.add(index);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                      onTap: () {
+                                        controller.seekTo(note.timestamp);
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    if (isExpanded)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0,
+                                          vertical: 8.0,
+                                        ),
+                                        child: Text(note
+                                            .content),
+                                      ),
+                                    Divider(),
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text("Show Notes"),
+                  ),
                 ],
               ),
             ),
