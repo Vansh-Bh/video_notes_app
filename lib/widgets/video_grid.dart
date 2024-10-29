@@ -63,22 +63,9 @@ class VideoThumbnail extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    video.title,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Last watched: $formattedDate at $formattedTime',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Notes: ${video.noteCount}',
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  Text(video.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Last watched: ${video.lastWatched.toString().split(' ')[0]}'),
+                  Text('Notes: ${video.noteCount}'),
                 ],
               ),
             ),
