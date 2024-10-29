@@ -1,10 +1,8 @@
-// file: app/modules/video_player/controllers/video_player_controller.dart
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_notes_app/api_service.dart';
 import 'package:video_notes_app/models/note.dart';
-import 'dart:io';
 
 import 'package:video_notes_app/models/video_data.dart';
 
@@ -33,7 +31,7 @@ class VideoPlayerController extends GetxController {
   void _initializePlayer() async {
     player = Player();
     videoController = VideoController(player);
-    
+
     try {
       if (video.value.isLocal) {
         await player.open(Media(video.value.path));
@@ -58,13 +56,13 @@ class VideoPlayerController extends GetxController {
     }
   }
 
-  void addNote(String content) async {
+  void addNote(String title,String content) async {
     final currentPosition = player.state.position;
     final note = Note(
       videoId: video.value.id,
       timestamp: currentPosition,
       content: content,
-      title: content.split('\n').first,
+      title: title,
     );
     try {
       await ApiService.addNote(note);
@@ -88,10 +86,14 @@ class VideoPlayerController extends GetxController {
     player.seek(nextNote.timestamp);
   }
 
+  void seekTo(Duration timestamp) {
+    player.seek(timestamp);
+  }
+
   void goToPreviousNote() {
     final currentPosition = player.state.position;
     final previousNote = notes.lastWhere(
-      (note) => note!.timestamp < currentPosition,
+      (note) => note.timestamp < currentPosition,
       orElse: () => notes.last,
     );
     player.seek(previousNote.timestamp);
