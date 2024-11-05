@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_notes_app/modules/video_player/video_player_controller.dart';
+import 'package:video_notes_app/widgets/notes_list.dart';
 import '../../../widgets/custom_seek_bar.dart';
 import '../../../widgets/note_editor.dart';
 
@@ -10,11 +11,11 @@ class VideoPlayerView extends GetView<VideoPlayerController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() => Text(controller.video.value.title)),
+        title: Text(controller.video.value.title),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         return Row(
           children: [
@@ -38,80 +39,34 @@ class VideoPlayerView extends GetView<VideoPlayerController> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Button to go to the previous note
                         ElevatedButton(
                           onPressed: controller.goToPreviousNote,
-                          child: Text('Previous Note'),
+                          child: const Text('Previous Note'),
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
+                        // Button to go to the next note
                         ElevatedButton(
                           onPressed: controller.goToNextNote,
-                          child: Text('Next Note'),
+                          child: const Text('Next Note'),
                         ),
                       ],
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          final Set<int> expandedNotes = {};
-
-                          return StatefulBuilder(
-                            builder: (context, setState) => ListView.builder(
-                              itemCount: controller.notes.length,
-                              itemBuilder: (context, index) {
-                                final note = controller.notes[index];
-                                final timestamp = note.timestamp;
-                                final formattedTime =
-                                    "${timestamp.inHours.toString().padLeft(2, '0')}:${(timestamp.inMinutes % 60).toString().padLeft(2, '0')}:${(timestamp.inSeconds % 60).toString().padLeft(2, '0')}";
-                                bool isExpanded = expandedNotes.contains(index);
-
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(note.title),
-                                      subtitle: Text(formattedTime),
-                                      trailing: IconButton(
-                                        icon: Icon(
-                                          isExpanded
-                                              ? Icons.expand_less
-                                              : Icons.expand_more,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (isExpanded) {
-                                              expandedNotes.remove(index);
-                                            } else {
-                                              expandedNotes.add(index);
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      onTap: () {
-                                        controller.seekTo(note.timestamp);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    if (isExpanded)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0,
-                                          vertical: 8.0,
-                                        ),
-                                        child: Text(note
-                                            .content),
-                                      ),
-                                    Divider(),
-                                  ],
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Text("Show Notes"),
+                  // Button to show the list of notes in a modal
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return NotesListView(controller: controller);
+                          },
+                        );
+                      },
+                      child: const Text("Show Notes"),
+                    ),
                   ),
                 ],
               ),
