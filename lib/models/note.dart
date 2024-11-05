@@ -1,6 +1,7 @@
 class Note {
   final String? id;
   final String videoId;
+  final String videoTitle;
   final Duration timestamp;
   final String content;
   final String title;
@@ -8,6 +9,7 @@ class Note {
   Note({
     this.id,
     required this.videoId,
+    required this.videoTitle,
     required this.timestamp,
     required this.content,
     required this.title,
@@ -18,6 +20,7 @@ class Note {
     return Note(
       id: json['_id'],
       videoId: json['videoId'],
+      videoTitle: json['videoTitle'],
       timestamp: Duration(milliseconds: json['timestamp']),
       content: json['content'],
       title: json['title'],
@@ -28,6 +31,7 @@ class Note {
   Map<String, dynamic> toJson() {
     return {
       'videoId': videoId,
+      'videoTitle': videoTitle,
       'timestamp': timestamp.inMilliseconds,
       'content': content,
       'title': title,

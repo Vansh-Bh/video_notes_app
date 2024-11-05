@@ -7,6 +7,7 @@ Welcome to Video Notes Application! This project consists of a [Flutter](https:/
 - Take time-stamped notes with rich text formatting
 - Dark mode support
 - Responsive design for various screen sizes
+- Search for all notes across all video or notes related to a video
 
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:

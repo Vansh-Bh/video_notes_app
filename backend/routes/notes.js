@@ -27,6 +27,7 @@ router.get('/:videoId', async (req, res) => {
 router.post('/', async (req, res) => {
     const note = new Note({
         videoId: req.body.videoId,
+        videoTitle: req.body.videoTitle,
         timestamp: req.body.timestamp,
         content: req.body.content,
         title: req.body.title,

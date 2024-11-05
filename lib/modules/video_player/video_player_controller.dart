@@ -46,7 +46,7 @@ class VideoPlayerController extends GetxController {
   // Method to fetch notes associated with the video
   Future<void> fetchNotes() async {
     try {
-      final fetchedNotes = await specific.fetchNotes(video.value.id);
+      final fetchedNotes = await ApiService.fetchNotes(video.value.id);
       notes.assignAll(fetchedNotes);
       await fetchNoteCount();
     } catch (e) {
@@ -60,16 +60,18 @@ class VideoPlayerController extends GetxController {
     final currentPosition = player.state.position;
     final newNote = Note(
       videoId: video.value.id,
+      videoTitle: video.value.title,
       timestamp: currentPosition,
       title: title,
       content: content,
     );
 
     try {
-      final createdNote = await specific.addNote(newNote);
+      final createdNote = await ApiService.addNote(newNote);
       notes.add(createdNote);
       await fetchNoteCount();
-      await specific.updateVideo(video.value);
+      await ApiService.updateVideo(video.value);
+      Get.snackbar('Success', 'Note Added Successfully');
     } catch (e) {
       print('Error adding note: $e');
       Get.snackbar('Error', 'Failed to add note');
@@ -79,12 +81,13 @@ class VideoPlayerController extends GetxController {
   // Method to update an existing note
   Future<void> updateNote(String id, String newTitle, String newContent) async {
     try {
-      await specific.updateNote(id, newTitle, newContent);
+      await ApiService.updateNote(id, newTitle, newContent);
       final index = notes.indexWhere((note) => note.id == id);
       if (index != -1) {
         notes[index] = Note(
           id: id,
           videoId: notes[index].videoId,
+          videoTitle: video.value.title,
           timestamp: notes[index].timestamp,
           title: newTitle,
           content: newContent,
@@ -104,10 +107,10 @@ class VideoPlayerController extends GetxController {
     }
 
     try {
-      await specific.deleteNote(noteId);
+      await ApiService.deleteNote(noteId);
       notes.removeWhere((note) => note.id == noteId);
       await fetchNoteCount();
-      await specific.updateVideo(video.value);
+      await ApiService.updateVideo(video.value);
     } catch (e) {
       print('Error deleting note: $e');
       Get.snackbar('Error', 'Failed to delete note');
@@ -160,7 +163,7 @@ class VideoPlayerController extends GetxController {
   // Fetch the count of notes associated with the video
   Future<void> fetchNoteCount() async {
     try {
-      final noteCount = await specific.fetchNoteCount(video.value.id);
+      final noteCount = await ApiService.fetchNoteCount(video.value.id);
       video.update((val) {
         val?.noteCount = noteCount;
       });
@@ -176,7 +179,7 @@ class VideoPlayerController extends GetxController {
     video.update((val) {
       val?.lastWatched = DateTime.now();
     });
-    specific.updateVideo(video.value);
+    ApiService.updateVideo(video.value);
     player.dispose();
     Get.back(result: true);
     super.onClose();
