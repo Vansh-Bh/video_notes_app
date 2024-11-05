@@ -39,7 +39,7 @@ class _AddVideoViewState extends State<AddVideoView> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
-        await specific.addVideo(VideoData(
+        await ApiService.addVideo(VideoData(
           id: '',
           title: _title,
           path: _path,

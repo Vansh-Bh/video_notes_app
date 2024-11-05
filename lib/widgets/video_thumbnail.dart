@@ -18,12 +18,12 @@ class VideoThumbnail extends StatelessWidget {
     required this.onRename,
   });
 
-  // Method to delete the video and asks user for conformation 
+  // Method to delete the video and asks user for conformation
   Future<void> _deleteVideo(BuildContext context) async {
     bool confirmed = await _showConfirmationDialog(context);
     if (confirmed) {
       try {
-        await specific.deleteVideo(video.id);
+        await ApiService.deleteVideo(video.id);
         Get.snackbar('Success', 'Video deleted successfully.',
             snackPosition: SnackPosition.BOTTOM);
         onDelete();
@@ -62,7 +62,7 @@ class VideoThumbnail extends StatelessWidget {
     if (confirmed && controller.text.isNotEmpty) {
       try {
         video.title = controller.text;
-        await specific.updateVideo(video);
+        await ApiService.updateVideo(video);
         Get.snackbar('Success', 'Video renamed successfully.',
             snackPosition: SnackPosition.BOTTOM);
         onRename();

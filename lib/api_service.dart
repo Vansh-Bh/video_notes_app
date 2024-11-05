@@ -4,7 +4,7 @@ import 'package:video_notes_app/models/note.dart';
 import 'package:video_notes_app/models/video_data.dart';
 
 // A service class for handling api requests related to videos and notes
-class specific {
+class ApiService {
   static const String baseUrl = 'http://localhost:3000/api';
 
   // Fetches a list of all videos from the server
