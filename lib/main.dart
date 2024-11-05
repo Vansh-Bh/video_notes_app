@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:video_notes_app/theme_changer.dart';
 
 import 'modules/home/home_binding.dart';
 import 'routes/app_pages.dart';
 
-void main() {
+void main() async {
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   runApp(MyApp());
