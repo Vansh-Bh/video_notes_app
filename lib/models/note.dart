@@ -13,6 +13,7 @@ class Note {
     required this.title,
   });
 
+   // Factory constructor to create a Note instance from JSON
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
       id: json['_id'],
@@ -23,6 +24,7 @@ class Note {
     );
   }
 
+  // Convert a Note instance to JSON format
   Map<String, dynamic> toJson() {
     return {
       'videoId': videoId,

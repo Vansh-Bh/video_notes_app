@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'dart:convert';
 
 class NoteEditor extends StatefulWidget {
-  final Function(String, String) onNoteAdded;
+  final Function(String, String) onNoteAdded; // Callback function to pass note data back.
 
   NoteEditor({required this.onNoteAdded});
 
@@ -19,6 +20,7 @@ class _NoteEditorState extends State<NoteEditor> {
   @override
   void initState() {
     super.initState();
+     // Initialize Quill controller with a basic document setup
     _controller = quill.QuillController.basic();
   }
 
@@ -30,16 +32,17 @@ class _NoteEditorState extends State<NoteEditor> {
     super.dispose();
   }
 
+  // Show an error dialog if the title is empty.
   void _showErrorDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Error'),
-        content: Text('Please enter a title for the note.'),
+        title: const Text('Error'),
+        content: const Text('Please enter a title for the note.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -50,16 +53,18 @@ class _NoteEditorState extends State<NoteEditor> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Title input field for the note.
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
             controller: _titleController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Title',
               border: OutlineInputBorder(),
             ),
           ),
         ),
+        // Simple toolbar for text formatting in the Quill editor.
         quill.QuillToolbar.simple(
           controller: _controller,
           configurations: const quill.QuillSimpleToolbarConfigurations(
@@ -68,6 +73,7 @@ class _NoteEditorState extends State<NoteEditor> {
             ),
           ),
         ),
+        // Main Quill editor for note content
         Expanded(
           child: quill.QuillEditor(
             controller: _controller,
@@ -84,19 +90,24 @@ class _NoteEditorState extends State<NoteEditor> {
             ),
           ),
         ),
-        ElevatedButton(
-          onPressed: () {
-            final noteTitle = _titleController.text.trim();
-            final noteContent = _controller.document.toPlainText().trim();
-            if (noteTitle.isEmpty) {
-              _showErrorDialog();
-            } else if (noteContent.isNotEmpty) {
-              widget.onNoteAdded(noteTitle, noteContent);
-              _titleController.clear();
-              _controller.clear();
-            }
-          },
-          child: Text('Add Note'),
+        // Button to add the note. If title is empty show error dialog.
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ElevatedButton(
+            onPressed: () {
+              final noteTitle = _titleController.text.trim();
+              final noteContent =
+                  jsonEncode(_controller.document.toDelta().toJson());
+              if (noteTitle.isEmpty) {
+                _showErrorDialog();
+              } else if (noteContent.isNotEmpty) {
+                widget.onNoteAdded(noteTitle, noteContent);
+                _titleController.clear();
+                _controller.clear();
+              }
+            },
+            child: const Text('Add Note'),
+          ),
         ),
       ],
     );
