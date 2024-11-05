@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:video_notes_app/models/note.dart';
 import 'package:video_notes_app/modules/video_player/video_player_controller.dart';
 import 'package:video_notes_app/widgets/edit_note_dialog.dart';
+import 'package:video_notes_app/widgets/password_dialog.dart';
 import 'package:video_notes_app/widgets/rich_text_viewer.dart';
 
 class NotesListView extends StatefulWidget {
@@ -16,9 +17,22 @@ class NotesListView extends StatefulWidget {
 
 class _NotesListViewState extends State<NotesListView> {
   Set<int> expandedNotes = {};
+  Set<int> unlockedNotes = {};
 
-  // Function to show the the edit not edit dialog
-  void _showEditNoteDialog(Note note) {
+  // Function to show the edit note dialog
+  Future<void> _showEditNoteDialog(Note note, int index) async {
+    // Check if note has a password
+    if (note.password != null &&
+        note.password!.isNotEmpty &&
+        !unlockedNotes.contains(index)) {
+      final enteredPassword = await Get.dialog<String>(PasswordDialog());
+      if (enteredPassword != note.password) {
+        Get.snackbar('Error', 'Incorrect password');
+        return; 
+      }
+      unlockedNotes.add(index);
+    }
+    // Show edit dialog if password is correct or if there's no password
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -30,6 +44,18 @@ class _NotesListViewState extends State<NotesListView> {
         );
       },
     );
+  }
+
+  // Check for correct password
+  Future<bool> _checkPassword(String? notePassword, int index) async {
+    if (notePassword == null || notePassword.isEmpty) return true;
+
+    final enteredPassword = await Get.dialog<String>(PasswordDialog());
+    if (enteredPassword == notePassword) {
+      unlockedNotes.add(index);
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -55,6 +81,7 @@ class _NotesListViewState extends State<NotesListView> {
           final formattedTime =
               "${timestamp.inHours.toString().padLeft(2, '0')}:${(timestamp.inMinutes % 60).toString().padLeft(2, '0')}:${(timestamp.inSeconds % 60).toString().padLeft(2, '0')}";
           bool isExpanded = expandedNotes.contains(index);
+          bool isUnlocked = unlockedNotes.contains(index);
 
           return Column(
             children: [
@@ -65,9 +92,13 @@ class _NotesListViewState extends State<NotesListView> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (note.password != null && note.password!.isNotEmpty)
+                      Icon(
+                        isUnlocked ? Icons.lock_open : Icons.lock,
+                      ),
                     // Button to edit the note
                     IconButton(
-                      onPressed: () => _showEditNoteDialog(note),
+                      onPressed: () => _showEditNoteDialog(note, index),
                       icon: const Icon(Icons.edit),
                     ),
                     // Button to delete the note
@@ -76,6 +107,7 @@ class _NotesListViewState extends State<NotesListView> {
                         await widget.controller.deleteNote(note.id);
                         setState(() {
                           expandedNotes.remove(index);
+                          unlockedNotes.remove(index);
                         });
                       },
                       icon: const Icon(Icons.delete),
@@ -85,14 +117,21 @@ class _NotesListViewState extends State<NotesListView> {
                       icon: Icon(
                         isExpanded ? Icons.expand_less : Icons.expand_more,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          if (isExpanded) {
+                      onPressed: () async {
+                        if (isExpanded) {
+                          setState(() {
                             expandedNotes.remove(index);
+                          });
+                        } else {
+                          if (isUnlocked ||
+                              await _checkPassword(note.password, index)) {
+                            setState(() {
+                              expandedNotes.add(index);
+                            });
                           } else {
-                            expandedNotes.add(index);
+                            Get.snackbar('Error', 'Incorrect password');
                           }
-                        });
+                        }
                       },
                     ),
                   ],

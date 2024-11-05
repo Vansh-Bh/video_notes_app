@@ -3,7 +3,8 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'dart:convert';
 
 class NoteEditor extends StatefulWidget {
-  final Function(String, String) onNoteAdded; // Callback function to pass note data back.
+  final Function(String, String, String?)
+      onNoteAdded; // Callback function to pass note data back.
 
   NoteEditor({required this.onNoteAdded});
 
@@ -16,11 +17,14 @@ class _NoteEditorState extends State<NoteEditor> {
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isPasswordProtected = false;
+  bool _isObscured = true;
 
   @override
   void initState() {
     super.initState();
-     // Initialize Quill controller with a basic document setup
+    // Initialize Quill controller with a basic document setup
     _controller = quill.QuillController.basic();
   }
 
@@ -90,6 +94,41 @@ class _NoteEditorState extends State<NoteEditor> {
             ),
           ),
         ),
+        Row(
+          children: [
+            Checkbox(
+              value: _isPasswordProtected,
+              onChanged: (value) {
+                setState(() {
+                  _isPasswordProtected = value ?? false;
+                });
+              },
+            ),
+            const Text('Password Protected'),
+          ],
+        ),
+        if (_isPasswordProtected)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isObscured ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isObscured = !_isObscured;
+                    });
+                  },
+                ),
+              ),
+              obscureText: _isObscured,
+            ),
+          ),
         // Button to add the note. If title is empty show error dialog.
         Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -101,9 +140,11 @@ class _NoteEditorState extends State<NoteEditor> {
               if (noteTitle.isEmpty) {
                 _showErrorDialog();
               } else if (noteContent.isNotEmpty) {
-                widget.onNoteAdded(noteTitle, noteContent);
+                widget.onNoteAdded(
+                    noteTitle, noteContent, _passwordController.text);
                 _titleController.clear();
                 _controller.clear();
+                _passwordController.clear();
               }
             },
             child: const Text('Add Note'),

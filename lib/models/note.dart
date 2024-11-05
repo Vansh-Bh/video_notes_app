@@ -5,6 +5,7 @@ class Note {
   final Duration timestamp;
   final String content;
   final String title;
+  String? password;
 
   Note({
     this.id,
@@ -13,9 +14,10 @@ class Note {
     required this.timestamp,
     required this.content,
     required this.title,
+    this.password,
   });
 
-   // Factory constructor to create a Note instance from JSON
+  // Factory constructor to create a Note instance from JSON
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
       id: json['_id'],
@@ -24,6 +26,7 @@ class Note {
       timestamp: Duration(milliseconds: json['timestamp']),
       content: json['content'],
       title: json['title'],
+      password: json['password'],
     );
   }
 
@@ -35,6 +38,7 @@ class Note {
       'timestamp': timestamp.inMilliseconds,
       'content': content,
       'title': title,
+      'password': password,
     };
   }
 }

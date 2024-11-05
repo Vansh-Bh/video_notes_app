@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
         timestamp: req.body.timestamp,
         content: req.body.content,
         title: req.body.title,
+        password: req.body.password
     });
 
     try {

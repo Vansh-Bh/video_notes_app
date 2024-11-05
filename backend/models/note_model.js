@@ -5,7 +5,8 @@ const NoteSchema = new mongoose.Schema({
   timestamp: { type: Number, required: true },
   content: { type: String, required: true },
   title: { type: String, required: true },
-  videoTitle: { type: String, required: true }
+  videoTitle: { type: String, required: true },
+  password: {type: String},
 });
 
 module.exports = mongoose.model('Note', NoteSchema);

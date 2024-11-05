@@ -56,7 +56,7 @@ class VideoPlayerController extends GetxController {
   }
 
   // Method to add a new note
-  Future<void> addNote(String title, String content) async {
+  Future<void> addNote(String title, String content, String? password) async {
     final currentPosition = player.state.position;
     final newNote = Note(
       videoId: video.value.id,
@@ -64,6 +64,7 @@ class VideoPlayerController extends GetxController {
       timestamp: currentPosition,
       title: title,
       content: content,
+      password: password
     );
 
     try {
@@ -91,6 +92,7 @@ class VideoPlayerController extends GetxController {
           timestamp: notes[index].timestamp,
           title: newTitle,
           content: newContent,
+          password: notes[index].password
         );
       }
     } catch (e) {
