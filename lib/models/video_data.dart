@@ -1,10 +1,10 @@
 class VideoData {
   final String id;
-  final String title;
+  String title;
   final String path;
   final bool isLocal;
   final String thumbnailUrl;
-  final DateTime lastWatched;
+  late DateTime lastWatched;
   int noteCount;
 
   VideoData({
@@ -17,6 +17,7 @@ class VideoData {
     this.noteCount = 0,
   });
 
+  // Factory constructor to create a VideoData instance from JSON
   factory VideoData.fromJson(Map<String, dynamic> json) {
     return VideoData(
       id: json['_id'],
@@ -29,6 +30,7 @@ class VideoData {
     );
   }
 
+  // Convert a VideoData instance to JSON format
   Map<String, dynamic> toJson() {
     return {
       '_id': id,

@@ -17,7 +17,9 @@ class _AddVideoViewState extends State<AddVideoView> {
   String _path = '';
   bool _isLocal = false;
   String _thumbnailUrl = '';
+  final TextEditingController _pathController = TextEditingController();
 
+  // Method to select a video file
   void _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
@@ -25,17 +27,19 @@ class _AddVideoViewState extends State<AddVideoView> {
 
     if (result != null) {
       setState(() {
-        _path = result.files.single.path!;
+        _path = 'file:///${result.files.single.path!}';
+        _pathController.text = _path;
         _isLocal = true;
       });
     }
   }
 
+  // Method to submit the form
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
-        await ApiService.addVideo(VideoData(
+        await specific.addVideo(VideoData(
           id: '',
           title: _title,
           path: _path,
@@ -45,9 +49,15 @@ class _AddVideoViewState extends State<AddVideoView> {
         ));
         Get.back(result: true);
       } catch (e) {
-        Get.snackbar('Error', 'Failed to add video: $e');
+        Get.snackbar('Error', '$e');
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _pathController.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,21 +70,28 @@ class _AddVideoViewState extends State<AddVideoView> {
           key: _formKey,
           child: Column(
             children: [
+              // Input field for video title
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) => value!.isEmpty ? 'Please enter a title' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a title' : null,
                 onSaved: (value) => _title = value!,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
+                    // Input field for video path or URL
                     child: TextFormField(
-                      decoration: const InputDecoration(labelText: 'Video Path/URL'),
-                      validator: (value) => value!.isEmpty ? 'Please enter a path or URL' : null,
+                      controller: _pathController,
+                      decoration:
+                          const InputDecoration(labelText: 'Video Path/URL'),
+                      validator: (value) =>
+                          value!.isEmpty ? 'Please enter a path or URL' : null,
                       onSaved: (value) => _path = value!,
                     ),
                   ),
+                  // File upload
                   IconButton(
                     icon: const Icon(Icons.file_upload),
                     onPressed: _selectFile,
@@ -82,12 +99,12 @@ class _AddVideoViewState extends State<AddVideoView> {
                 ],
               ),
               const SizedBox(height: 16),
+              // Input field for thumbnail URL
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Thumbnail URL'),
-                validator: (value) => value!.isEmpty ? 'Please enter a thumbnail URL' : null,
                 onSaved: (value) => _thumbnailUrl = value!,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: _submitForm,
                 child: const Text('Add Video'),
