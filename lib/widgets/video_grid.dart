@@ -1,76 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../models/video_data.dart';
-import '../routes/app_pages.dart';
+import 'video_thumbnail.dart';
 
-class VideoGrid extends StatelessWidget {
+class VideoGrid extends StatefulWidget {
   final List<VideoData> videos;
+  final Function(VideoData) onVideoTap;
 
-  VideoGrid({required this.videos});
+  VideoGrid({required this.videos, required this.onVideoTap});
+
+  @override
+  _VideoGridState createState() => _VideoGridState();
+}
+
+class _VideoGridState extends State<VideoGrid> {
+  late List<VideoData> _videos;
+
+  @override
+  void initState() {
+    super.initState();
+    _videos = widget.videos;
+  }
+
+  // Method to delete the video
+  void _removeVideo(String videoId) {
+    setState(() {
+      _videos.removeWhere((video) => video.id == videoId);
+    });
+  }
+
+  // Method to rename the video
+  void _renameVideo(VideoData updatedVideo) {
+    setState(() {
+      int index = _videos.indexWhere((video) => video.id == updatedVideo.id);
+      if (index != -1) {
+        _videos[index] = updatedVideo;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 16 / 12,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: videos.length,
-        itemBuilder: (context, index) {
-          return VideoThumbnail(video: videos[index]);
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const double cardWidth = 300;
+          const double spacing = 16;
+          int crossAxisCount =
+              (constraints.maxWidth / (cardWidth + spacing)).floor();
+          crossAxisCount = crossAxisCount < 1 ? 1 : crossAxisCount;
+
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: 4 / 3,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
+            ),
+            itemCount: _videos.length,
+            itemBuilder: (context, index) {
+              return VideoThumbnail(
+                video: _videos[index],
+                onDelete: () => _removeVideo(_videos[index].id),
+                onTap: () => widget.onVideoTap(_videos[index]),
+                onRename: () => _renameVideo(_videos[index]),
+              );
+            },
+          );
         },
-      ),
-    );
-  }
-}
-
-class VideoThumbnail extends StatelessWidget {
-  final VideoData video;
-
-  VideoThumbnail({required this.video});
-
-  @override
-  Widget build(BuildContext context) {
-    String formattedDate = DateFormat('dd-MM-yyyy').format(video.lastWatched);
-    String formattedTime = DateFormat('HH:mm:ss').format(video.lastWatched);
-
-    return GestureDetector(
-      onTap: () => Get.toNamed(Routes.VIDEO_PLAYER, arguments: video),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.network(
-                  video.thumbnailUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(video.title, style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('Last watched: ${video.lastWatched.toString().split(' ')[0]}'),
-                  Text('Notes: ${video.noteCount}'),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -7,13 +7,14 @@ import '../../../widgets/video_grid.dart';
 class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
-    final themeService = Get.find<ThemeService>();
+    final themeService = Get.find<
+        ThemeService>(); // Retrieves ThemeService instance for theme switching
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Videos'),
+        title: const Text('My Videos'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             tooltip: 'Add Video',
             onPressed: controller.addVideo,
           ),
@@ -30,9 +31,14 @@ class HomeView extends GetView<HomeController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
+        } else if (controller.videos.isEmpty) {
+          return const Center(child: Text('No videos found'));
         } else {
-          return VideoGrid(videos: controller.videos);
+          return VideoGrid(
+            videos: controller.videos,
+            onVideoTap: controller.navigateToVideoPlayer,
+          );
         }
       }),
     );
