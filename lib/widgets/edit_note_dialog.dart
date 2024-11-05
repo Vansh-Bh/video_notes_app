@@ -85,8 +85,15 @@ class _EditNoteDialogState extends State<EditNoteDialog> {
           ),
           actions: [
             TextButton(
+              style: ButtonStyle(
+                overlayColor:
+                    WidgetStateProperty.all(Colors.red.withOpacity(0.1)),
+              ),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
